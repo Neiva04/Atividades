@@ -3,10 +3,11 @@ import math
 import tkinter as tk
 from tkinter import messagebox
 import time
+import heapq    
 
 
-N = 10
-M = 10
+N = 20
+M = 20
 L = 5
 
 grid = []
@@ -66,7 +67,7 @@ class GridWorld(tk.Tk):
         self.decision_callback = decision_callback
         self.number_decisions = 0
         self.found_treasure = False
-        self.max_decisions = 500
+        self.max_decisions = 5000
 
         self.canvas = tk.Canvas(self, width=self.M*40, height=self.N*40)
         self.canvas.pack()
@@ -112,6 +113,7 @@ class GridWorld(tk.Tk):
         x2, y2 = x1+42, y1+42
         self.canvas.create_rectangle(x1+15, y1+15, x2-15, y2-15, fill="gold",outline="black", width=2)
         
+    
         
     def make_decision(self):
         up = None
