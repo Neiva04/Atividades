@@ -1,3 +1,4 @@
+#TO-DO: Get Bill Home
 import random
 import math
 import tkinter as tk
@@ -114,6 +115,7 @@ class GridWorld(tk.Tk):
         self.draw_treasure()
 
         if self.decision_callback:
+            print("Starting...")
             self.after(100, self.make_decision)
 
     def get_random_open_position(self):
@@ -136,11 +138,15 @@ class GridWorld(tk.Tk):
                 self.canvas.create_rectangle(x1, y1, x2, y2, fill=color, outline="black")
         #desenha o melhor caminho
         self.shortest_path_cells = calculate_shortest_path(self.grid, (self.bill_i, self.bill_j), (self.treasure_i, self.treasure_j))
+        print(self.shortest_path_cells)
+        if(self.shortrest_path_cells== []):
+            generate_grid(N, M)
         for i, j in self.shortest_path_cells:
             x1, y1 = j * 40, i * 40
             x2, y2 = x1 + 40, y1 + 40
             
             self.canvas.create_rectangle(x1, y1, x2, y2, fill="green", outline="black")
+
     def draw_bill(self):
         x1, y1 = self.bill_j*40, self.bill_i*40
         x2, y2 = x1+40, y1+40
@@ -150,10 +156,6 @@ class GridWorld(tk.Tk):
         x1, y1 = self.treasure_j*40, self.treasure_i*40
         x2, y2 = x1+42, y1+42
         self.canvas.create_rectangle(x1+15, y1+15, x2-15, y2-15, fill="gold",outline="black", width=2)
-        
-   
-
-            
     
         
     def make_decision(self):
@@ -162,7 +164,6 @@ class GridWorld(tk.Tk):
         left = None
         right = None
 
-        
 
         if self.bill_i > 0 and self.grid[self.bill_i-1][self.bill_j] != "wall":
             up = math.sqrt((self.bill_i-1 - self.treasure_i)**2 + (self.bill_j - self.treasure_j)**2)
@@ -172,10 +173,10 @@ class GridWorld(tk.Tk):
             left = math.sqrt((self.bill_i - self.treasure_i)**2 + (self.bill_j-1 - self.treasure_j)**2)
         if self.bill_j < self.M-1 and self.grid[self.bill_i][self.bill_j+1] != "wall":
             right = math.sqrt((self.bill_i - self.treasure_i)**2 + (self.bill_j+1 - self.treasure_j)**2)
-
         
-
+        # Aqui faz o callback
         direction = self.decision_callback(up, down, left, right)
+        # print(direction)
         self.number_decisions  += 1
 
         if direction == "giveup":
@@ -191,13 +192,9 @@ class GridWorld(tk.Tk):
         elif direction == "right" and right is not None:
             self.bill_j += 1
         else:
-            print("parede")
+            # print("parede")
             self.make_decision()
-            # self.quit()
             return
-
-        
-
  
        
         if self.bill_i == self.treasure_i and self.bill_j == self.treasure_j:
@@ -224,7 +221,7 @@ class GridWorld(tk.Tk):
 
 def example_callback(up, down, left, right):
     directions = ["up", "down", "left", "right"]
-    distances = [up, down, left, right]
+    # distances = [up, down, left, right]
     
     passo = random.choice(directions)
     return passo
