@@ -64,7 +64,7 @@ class GridWorld(tk.Tk):
         self.decision_callback = decision_callback
         self.number_decisions = 0
         self.found_treasure = False
-        self.max_decisions = 500
+        self.max_decisions = 100
 
         self.canvas = tk.Canvas(self, width=self.M*40, height=self.N*40)
         self.canvas.pack()
@@ -141,27 +141,19 @@ class GridWorld(tk.Tk):
         elif direction == "right" and right is not None:
             self.bill_j += 1
         else:
-            while up == None or down == None or left == None or right == None:
-                self.number_decisions  += 1 
-                direction = self.decision_callback(up, down, left, right)
-                if direction == "up" and up is not None:
-                    self.bill_i -= 1
-                elif direction == "down" and down is not None:
-                    self.bill_i += 1
-                elif direction == "left" and left is not None:
-                    self.bill_j -= 1
-                elif direction == "right" and right is not None:
-                    self.bill_j += 1
-            #messagebox.showinfo("Error", "Invalid direction returned by decision_callback")
+            print("parede")
+            self.make_decision()
             # self.quit()
             return
+        
 
         if self.bill_i == self.treasure_i and self.bill_j == self.treasure_j:
-            #messagebox.showinfo("Congratulations", "Bill found the treasure!")
+            print("Bill found home!")
+            messagebox.showinfo("Congratulations", "Bill found Home!")
             self.found_treasure = True
             self.quit()
         elif self.number_decisions >= self.max_decisions:
-            #messagebox.showinfo("Time's up", "Maximum number of decisiosn reached, sorry!")
+            messagebox.showinfo("Time's up", "Maximum number of decisiosn reached, sorry!")
             self.quit()
         else:
             self.canvas.delete("all")
@@ -177,8 +169,9 @@ class GridWorld(tk.Tk):
 def example_callback(up, down, left, right):
     directions = ["up", "down", "left", "right"]
     distances = [up, down, left, right]
-
-    return random.choice(directions)
+    
+    passo = random.choice(directions)
+    return passo
 
         
 app = GridWorld(N, M, L, grid, example_callback)
@@ -199,5 +192,6 @@ if app.found_treasure:
 else:
   score += reward_no_treasure
   
-print(score)   
+print("Score:",score)
+print("Number of decisions:", app.number_decisions)   
         
