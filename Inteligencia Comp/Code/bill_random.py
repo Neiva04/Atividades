@@ -2,6 +2,7 @@ import random
 import math
 import tkinter as tk
 from tkinter import messagebox
+import time
 
 
 N = 10
@@ -41,6 +42,7 @@ def generate_grid(N, M):
     return grid
 
 grid = generate_grid(N,M)
+start_time = time.time()
 
 
 # Generate random treasure location
@@ -64,7 +66,7 @@ class GridWorld(tk.Tk):
         self.decision_callback = decision_callback
         self.number_decisions = 0
         self.found_treasure = False
-        self.max_decisions = 100
+        self.max_decisions = 500
 
         self.canvas = tk.Canvas(self, width=self.M*40, height=self.N*40)
         self.canvas.pack()
@@ -103,12 +105,12 @@ class GridWorld(tk.Tk):
     def draw_bill(self):
         x1, y1 = self.bill_j*40, self.bill_i*40
         x2, y2 = x1+40, y1+40
-        self.canvas.create_oval(x1+10, y1+10, x2-10, y2-10, fill="yellow")
+        self.canvas.create_oval(x1+10, y1+10, x2-10, y2-10, fill="red", outline="blue", width=3)
 
     def draw_treasure(self):
         x1, y1 = self.treasure_j*40, self.treasure_i*40
-        x2, y2 = x1+40, y1+40
-        self.canvas.create_rectangle(x1+15, y1+15, x2-15, y2-15, fill="gold", outline="black")
+        x2, y2 = x1+42, y1+42
+        self.canvas.create_rectangle(x1+15, y1+15, x2-15, y2-15, fill="gold",outline="black", width=2)
         
         
     def make_decision(self):
@@ -147,13 +149,22 @@ class GridWorld(tk.Tk):
             return
         
 
+ 
+       
         if self.bill_i == self.treasure_i and self.bill_j == self.treasure_j:
-            print("Bill found home!")
-            messagebox.showinfo("Congratulations", "Bill found Home!")
+            end_time = time.time()
+            
+            self.elapsed_time = end_time - start_time
+            messagebox.showinfo(title="Congratulations",message= "Bill found Home!"+
+                                "\nTime: " + str(self.elapsed_time))
             self.found_treasure = True
             self.quit()
         elif self.number_decisions >= self.max_decisions:
-            messagebox.showinfo("Time's up", "Maximum number of decisiosn reached, sorry!")
+            end_time = time.time()
+            self.elapsed_time = end_time - start_time
+            messagebox.showinfo("Time's up", "Bill didnt find Home!"+
+                                "\nTime: " + str(self.elapsed_time))
+            
             self.quit()
         else:
             self.canvas.delete("all")
@@ -181,17 +192,19 @@ app = GridWorld(N, M, L, grid, example_callback)
 #app.bind("<Down>", lambda event: app.move_bill("down"))
 app.mainloop()
 
+
 cost_decision = -1     # Recompensa a cada rodada
 reward_treasure = 1000 # Recompensa se achar o tesouro
 reward_no_treasure = 0 # Recompensa se não achar
 
 score = cost_decision * app.number_decisions 
 
+
 if app.found_treasure:
-  score += reward_treasure     
+    score += reward_treasure     
 else:
-  score += reward_no_treasure
-  
+    score += reward_no_treasure
+messagebox.showinfo("Info", "Score: " + str(score)+
+                    "\nNumber of decisions: "+str(app.number_decisions))
 print("Score:",score)
-print("Number of decisions:", app.number_decisions)   
-        
+print("Number of decisions:", app.number_decisions)  
