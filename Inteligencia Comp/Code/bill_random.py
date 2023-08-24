@@ -3,8 +3,7 @@ import math
 import tkinter as tk
 from tkinter import messagebox
 import time
-import heapq    
-
+import heapq
 
 N = 20
 M = 20
@@ -57,6 +56,39 @@ while True:
     treasure_j = random.randint(1, M-2)
     print("treasure_i = {}, treasure_j = {}".format(treasure_i, treasure_j))
 
+def calculate_shortest_path(grid, start, end):
+    directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]  # Right, Left, Down, Up
+
+    def heuristic(node):
+        return abs(node[0] - end[0]) + abs(node[1] - end[1])
+
+    open_set = [(0, start)]  # Priority queue: (f-score, node)
+    came_from = {}  # Parent of each node
+    g_scores = {start: 0}
+
+    while open_set:
+        _, current = heapq.heappop(open_set)
+
+        if current == end:
+            path = []
+            while current in came_from:
+                path.insert(0, current)
+                current = came_from[current]
+            return path
+
+        for di, dj in directions:
+            neighbor = current[0] + di, current[1] + dj
+            if 0 <= neighbor[0] < len(grid) and 0 <= neighbor[1] < len(grid[0]) and grid[neighbor[0]][neighbor[1]] != "wall":
+                tentative_g = g_scores[current] + 1
+                if neighbor not in g_scores or tentative_g < g_scores[neighbor]:
+                    g_scores[neighbor] = tentative_g
+                    f_score = tentative_g + heuristic(neighbor)
+                    heapq.heappush(open_set, (f_score, neighbor))
+                    came_from[neighbor] = current
+
+    return []  # If no path is found
+
+
 class GridWorld(tk.Tk):
     def __init__(self, N, M, L, grid, decision_callback=None):
         tk.Tk.__init__(self)
@@ -102,7 +134,13 @@ class GridWorld(tk.Tk):
                 x1, y1 = j*40, i*40
                 x2, y2 = x1+40, y1+40
                 self.canvas.create_rectangle(x1, y1, x2, y2, fill=color, outline="black")
-
+        #desenha o melhor caminho
+        self.shortest_path_cells = calculate_shortest_path(self.grid, (self.bill_i, self.bill_j), (self.treasure_i, self.treasure_j))
+        for i, j in self.shortest_path_cells:
+            x1, y1 = j * 40, i * 40
+            x2, y2 = x1 + 40, y1 + 40
+            
+            self.canvas.create_rectangle(x1, y1, x2, y2, fill="green", outline="black")
     def draw_bill(self):
         x1, y1 = self.bill_j*40, self.bill_i*40
         x2, y2 = x1+40, y1+40
@@ -113,6 +151,9 @@ class GridWorld(tk.Tk):
         x2, y2 = x1+42, y1+42
         self.canvas.create_rectangle(x1+15, y1+15, x2-15, y2-15, fill="gold",outline="black", width=2)
         
+   
+
+            
     
         
     def make_decision(self):
@@ -120,6 +161,9 @@ class GridWorld(tk.Tk):
         down = None
         left = None
         right = None
+
+        
+
         if self.bill_i > 0 and self.grid[self.bill_i-1][self.bill_j] != "wall":
             up = math.sqrt((self.bill_i-1 - self.treasure_i)**2 + (self.bill_j - self.treasure_j)**2)
         if self.bill_i < self.N-1 and self.grid[self.bill_i+1][self.bill_j] != "wall":
@@ -128,6 +172,8 @@ class GridWorld(tk.Tk):
             left = math.sqrt((self.bill_i - self.treasure_i)**2 + (self.bill_j-1 - self.treasure_j)**2)
         if self.bill_j < self.M-1 and self.grid[self.bill_i][self.bill_j+1] != "wall":
             right = math.sqrt((self.bill_i - self.treasure_i)**2 + (self.bill_j+1 - self.treasure_j)**2)
+
+        
 
         direction = self.decision_callback(up, down, left, right)
         self.number_decisions  += 1
@@ -149,6 +195,7 @@ class GridWorld(tk.Tk):
             self.make_decision()
             # self.quit()
             return
+
         
 
  
@@ -175,10 +222,6 @@ class GridWorld(tk.Tk):
             self.draw_treasure()
             self.after(500, self.make_decision)
 
-# You return one of these: up, down, left, right or giveup
-# As parameters you receive the euclidean distance
-# to the goal from each neighborhood position
-# if the position is a wall it will return None as distance
 def example_callback(up, down, left, right):
     directions = ["up", "down", "left", "right"]
     distances = [up, down, left, right]
