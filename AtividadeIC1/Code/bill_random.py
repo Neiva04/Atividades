@@ -52,6 +52,7 @@ while True:
         break
     treasure_i = random.randint(1, N-2)
     treasure_j = random.randint(1, M-2)
+    print("treasure_i = {}, treasure_j = {}".format(treasure_i, treasure_j))
 
 class GridWorld(tk.Tk):
     def __init__(self, N, M, L, grid, decision_callback=None):
@@ -102,12 +103,12 @@ class GridWorld(tk.Tk):
     def draw_bill(self):
         x1, y1 = self.bill_j*40, self.bill_i*40
         x2, y2 = x1+40, y1+40
-        self.canvas.create_oval(x1+10, y1+10, x2-10, y2-10, fill="red")
+        self.canvas.create_oval(x1+10, y1+10, x2-10, y2-10, fill="yellow")
 
     def draw_treasure(self):
         x1, y1 = self.treasure_j*40, self.treasure_i*40
         x2, y2 = x1+40, y1+40
-        self.canvas.create_rectangle(x1+15, y1+15, x2-15, y2-15, fill="yellow")
+        self.canvas.create_rectangle(x1+15, y1+15, x2-15, y2-15, fill="gold", outline="black")
         
         
     def make_decision(self):
@@ -140,8 +141,19 @@ class GridWorld(tk.Tk):
         elif direction == "right" and right is not None:
             self.bill_j += 1
         else:
+            while up == None or down == None or left == None or right == None:
+                self.number_decisions  += 1 
+                direction = self.decision_callback(up, down, left, right)
+                if direction == "up" and up is not None:
+                    self.bill_i -= 1
+                elif direction == "down" and down is not None:
+                    self.bill_i += 1
+                elif direction == "left" and left is not None:
+                    self.bill_j -= 1
+                elif direction == "right" and right is not None:
+                    self.bill_j += 1
             #messagebox.showinfo("Error", "Invalid direction returned by decision_callback")
-            self.quit()
+            # self.quit()
             return
 
         if self.bill_i == self.treasure_i and self.bill_j == self.treasure_j:
