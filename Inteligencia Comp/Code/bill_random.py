@@ -5,13 +5,15 @@ import tkinter as tk
 from tkinter import messagebox
 import time
 import heapq
+import sys
+import os
 
 N = 20
 M = 20
 L = 5
 
 grid = []
-
+start_time = time.time()
 def generate_grid(N, M):
     grid = []
     for i in range(N):
@@ -40,22 +42,25 @@ def generate_grid(N, M):
         j = random.randint(1, M-2)
         grid[i][j] = "open"
 
+    # Generate random treasure location
+    treasure_i = random.randint(1, N-2)
+    treasure_j = random.randint(1, M-2)
+    while True:
+        distance = math.sqrt((treasure_i - 1)**2 + (treasure_j - 1)**2)
+        if distance >= L:
+            break
+        treasure_i = random.randint(1, N-2)
+        treasure_j = random.randint(1, M-2)
+    #   print("treasure_i = {}, treasure_j = {}".format(treasure_i, treasure_j))
+
     return grid
 
 grid = generate_grid(N,M)
-start_time = time.time()
 
 
-# Generate random treasure location
-treasure_i = random.randint(1, N-2)
-treasure_j = random.randint(1, M-2)
-while True:
-    distance = math.sqrt((treasure_i - 1)**2 + (treasure_j - 1)**2)
-    if distance >= L:
-        break
-    treasure_i = random.randint(1, N-2)
-    treasure_j = random.randint(1, M-2)
-    print("treasure_i = {}, treasure_j = {}".format(treasure_i, treasure_j))
+
+
+
 
 def calculate_shortest_path(grid, start, end):
     directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]  # Right, Left, Down, Up
@@ -86,9 +91,11 @@ def calculate_shortest_path(grid, start, end):
                     f_score = tentative_g + heuristic(neighbor)
                     heapq.heappush(open_set, (f_score, neighbor))
                     came_from[neighbor] = current
-
+    #if no path is found generate new grid
+    
     return []  # If no path is found
 
+    
 
 class GridWorld(tk.Tk):
     def __init__(self, N, M, L, grid, decision_callback=None):
@@ -109,6 +116,16 @@ class GridWorld(tk.Tk):
         self.treasure_i, self.treasure_j = self.get_random_open_position()
         while math.sqrt((self.bill_i - self.treasure_i)**2 + (self.bill_j - self.treasure_j)**2) < self.L:
             self.treasure_i, self.treasure_j = self.get_random_open_position()
+
+        #Test if there is a possible path, if not generate new grid
+        path = calculate_shortest_path(self.grid, (self.bill_i, self.bill_j), (self.treasure_i, self.treasure_j))
+        while path == []:
+            grid = generate_grid(N, M)
+            path = calculate_shortest_path(grid, (0, 0), (N-1, M-1))
+            if path is not []:
+                print("Path found!")
+                python = sys.executable
+                os.execl(python, python, * sys.argv)
 
         self.draw_grid()
         self.draw_bill()
@@ -136,16 +153,14 @@ class GridWorld(tk.Tk):
                 x1, y1 = j*40, i*40
                 x2, y2 = x1+40, y1+40
                 self.canvas.create_rectangle(x1, y1, x2, y2, fill=color, outline="black")
-        #desenha o melhor caminho
+#desenha o melhor caminho
         self.shortest_path_cells = calculate_shortest_path(self.grid, (self.bill_i, self.bill_j), (self.treasure_i, self.treasure_j))
-        print(self.shortest_path_cells)
-        if(self.shortrest_path_cells== []):
-            generate_grid(N, M)
+        
         for i, j in self.shortest_path_cells:
             x1, y1 = j * 40, i * 40
             x2, y2 = x1 + 40, y1 + 40
-            
             self.canvas.create_rectangle(x1, y1, x2, y2, fill="green", outline="black")
+        
 
     def draw_bill(self):
         x1, y1 = self.bill_j*40, self.bill_i*40
@@ -173,7 +188,8 @@ class GridWorld(tk.Tk):
             left = math.sqrt((self.bill_i - self.treasure_i)**2 + (self.bill_j-1 - self.treasure_j)**2)
         if self.bill_j < self.M-1 and self.grid[self.bill_i][self.bill_j+1] != "wall":
             right = math.sqrt((self.bill_i - self.treasure_i)**2 + (self.bill_j+1 - self.treasure_j)**2)
-        
+
+
         # Aqui faz o callback
         direction = self.decision_callback(up, down, left, right)
         # print(direction)
@@ -246,7 +262,7 @@ if app.found_treasure:
     score += reward_treasure     
 else:
     score += reward_no_treasure
-messagebox.showinfo("Info", "Score: " + str(score)+
-                    "\nNumber of decisions: "+str(app.number_decisions))
+# messagebox.showinfo("Info", "Score: " + str(score)+
+#                     "\nNumber of decisions: "+str(app.number_decisions))
 print("Score:",score)
 print("Number of decisions:", app.number_decisions)  
