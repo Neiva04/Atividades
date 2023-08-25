@@ -225,7 +225,7 @@ def example_callback(up, down, left, right):
     
     passo = random.choice(directions)
     return passo
-
+ 
         
 app = GridWorld(N, M, L, grid, example_callback)
 #app.bind("<Left>", lambda event: app.move_bill("left"))
