@@ -10,5 +10,5 @@ O curso de Engenharia de Computação no SENAI Cimatec é projetado para fornece
 
 O repositório está organizado de acordo com as matérias do curso. Cada matéria possui sua própria pasta, onde você encontrará os arquivos referentes às atividades, projetos e exercícios. Sinta-se à vontade para explorar as pastas, baixar os arquivos e contribuir, caso deseje.
 
-## Pague um café pro estudante
+## Pague um café pro dev
 Meu pix: 71 99991-6129
