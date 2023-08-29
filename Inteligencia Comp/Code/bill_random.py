@@ -7,9 +7,10 @@ import time
 import heapq
 import sys
 import os
+import datetime
 
-N = 20
-M = 20
+N = 10
+M = 10
 L = 5
 
 grid = []
@@ -217,8 +218,8 @@ class GridWorld(tk.Tk):
             end_time = time.time()
             
             self.elapsed_time = end_time - start_time
-            messagebox.showinfo(title="Congratulations",message= "Bill found Home!"+
-                                "\nTime: " + str(self.elapsed_time))
+            # messagebox.showinfo(title="Congratulations",message= "Bill found Home!"+
+            #                     "\nTime: " + str(self.elapsed_time))
             self.found_treasure = True
             self.quit()
         elif self.number_decisions >= self.max_decisions:
@@ -233,7 +234,7 @@ class GridWorld(tk.Tk):
             self.draw_grid()
             self.draw_bill()
             self.draw_treasure()
-            self.after(500, self.make_decision)
+            self.after(0, self.make_decision)
 
 def example_callback(up, down, left, right):
     directions = ["up", "down", "left", "right"]
@@ -262,7 +263,14 @@ if app.found_treasure:
     score += reward_treasure     
 else:
     score += reward_no_treasure
-# messagebox.showinfo("Info", "Score: " + str(score)+
-#                     "\nNumber of decisions: "+str(app.number_decisions))
+messagebox.showinfo("Info", "Score: " + str(score)+
+                    "\nNumber of decisions: "+str(app.number_decisions))
 print("Score:",score)
 print("Number of decisions:", app.number_decisions)  
+
+def add_to_file(decisions):
+    current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    file_path = os.path.join(os.path.dirname(__file__), "decisions.txt")
+    with open(file_path, "a") as file:
+        file.write(f"Tentativa {current_time}: numero de decisoes: {decisions}\n")
+add_to_file(app.number_decisions)
