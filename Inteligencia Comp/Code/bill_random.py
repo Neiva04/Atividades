@@ -123,7 +123,7 @@ class GridWorld(tk.Tk):
             grid = generate_grid(N, M)
             path = calculate_shortest_path(grid, (0, 0), (N-1, M-1))
             if path is not []:
-                print("Path found!")
+                print("Path not found!")
                 python = sys.executable
                 os.execl(python, python, * sys.argv)
 
@@ -208,9 +208,10 @@ class GridWorld(tk.Tk):
         elif direction == "right" and right is not None:
             self.bill_j += 1
         else:
-            print("Error")
             if(direction is None):
+                print("none")
                 direction = random.choice(["up", "down", "left", "right"])
+                print(direction)
                 if direction == "up" and up is not None:
                     self.bill_i -= 1
                 elif direction == "down" and down is not None:
@@ -220,11 +221,8 @@ class GridWorld(tk.Tk):
                 elif direction == "right" and right is not None:
                     self.bill_j += 1
                 else:
-                    self.make_decision()
-            # self.shortest_path_cells = calculate_shortest_path(self.grid, (self.bill_i, self.bill_j), (self.treasure_i, self.treasure_j)) 
-            # self.bill_i, self.bill_j = self.shortest_path_cells[0] 
-            # self.bill_i -= 1\
-            # print("parede")
+                    print("wall")
+                                
             
             
  
@@ -249,7 +247,7 @@ class GridWorld(tk.Tk):
             self.draw_grid()
             self.draw_bill()
             self.draw_treasure()
-            self.after(100, self.make_decision)
+            self.after(1000, self.make_decision)
 
 def example_callback(up, down, left, right):
     directions = ["up", "down", "left", "right"]
@@ -312,7 +310,7 @@ print("Number of decisions:", app.number_decisions)
 
 def add_to_file(decisions):
     
-    file_path = os.path.join(os.path.dirname(__file__), "decisions.txt")
+    file_path = os.path.join(os.path.dirname(__file__), "decisions_log.txt")
     with open(file_path, "a") as file:
         file.write(f"{decisions}\n")
 add_to_file(app.number_decisions)
