@@ -61,7 +61,7 @@ grid = generate_grid(N,M)
 
 
 
-
+#Calcula menor caminho, e caminho possivel
 def calculate_shortest_path(grid, start, end):
     directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]  # Right, Left, Down, Up
 
@@ -121,7 +121,7 @@ class GridWorld(tk.Tk):
         path = calculate_shortest_path(self.grid, (self.bill_i, self.bill_j), (self.treasure_i, self.treasure_j))
         while path == []:
             grid = generate_grid(N, M)
-            path = calculate_shortest_path(grid, (0, 0), (N-1, M-1))
+            # path = calculate_shortest_path(grid, (0, 0), (N-1, M-1))
             if path is not []:
                 print("Path not found!")
                 python = sys.executable
@@ -153,9 +153,8 @@ class GridWorld(tk.Tk):
                 x1, y1 = j*40, i*40
                 x2, y2 = x1+40, y1+40
                 self.canvas.create_rectangle(x1, y1, x2, y2, fill=color, outline="black")
-#desenha o melhor caminho
+        #desenha o melhor caminho
         self.shortest_path_cells = calculate_shortest_path(self.grid, (self.bill_i, self.bill_j), (self.treasure_i, self.treasure_j))
-        
         for i, j in self.shortest_path_cells:
             x1, y1 = j * 40, i * 40
             x2, y2 = x1 + 40, y1 + 40
