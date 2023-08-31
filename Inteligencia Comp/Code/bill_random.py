@@ -7,7 +7,6 @@ import time
 import heapq
 import sys
 import os
-import datetime
 
 N = 10
 M = 10
@@ -124,7 +123,7 @@ class GridWorld(tk.Tk):
             grid = generate_grid(N, M)
             path = calculate_shortest_path(grid, (0, 0), (N-1, M-1))
             if path is not []:
-                print("Path found!")
+                print("Path not found!")
                 python = sys.executable
                 os.execl(python, python, * sys.argv)
 
@@ -193,7 +192,7 @@ class GridWorld(tk.Tk):
 
         # Aqui faz o callback
         direction = self.decision_callback(up, down, left, right)
-        # print(direction)
+        print(direction)
         self.number_decisions  += 1
 
         if direction == "giveup":
@@ -209,9 +208,23 @@ class GridWorld(tk.Tk):
         elif direction == "right" and right is not None:
             self.bill_j += 1
         else:
-            # print("parede")
-            self.make_decision()
-            return
+            if(direction is None):
+                print("none")
+                direction = random.choice(["up", "down", "left", "right"])
+                print(direction)
+                if direction == "up" and up is not None:
+                    self.bill_i -= 1
+                elif direction == "down" and down is not None:
+                    self.bill_i += 1
+                elif direction == "left" and left is not None:
+                    self.bill_j -= 1
+                elif direction == "right" and right is not None:
+                    self.bill_j += 1
+                else:
+                    print("wall")
+                                
+            
+            
  
        
         if self.bill_i == self.treasure_i and self.bill_j == self.treasure_j:
@@ -234,14 +247,41 @@ class GridWorld(tk.Tk):
             self.draw_grid()
             self.draw_bill()
             self.draw_treasure()
-            self.after(0, self.make_decision)
+            self.after(1000, self.make_decision)
 
 def example_callback(up, down, left, right):
     directions = ["up", "down", "left", "right"]
     # distances = [up, down, left, right]
     
-    passo = random.choice(directions)
-    return passo
+    if(up == None):
+        cal_Up = 10000
+    else:
+        cal_Up = up
+    if(down == None):
+        cal_Down = 10000
+    else:
+        cal_Down = down
+    if(left == None):
+        cal_Left = 10000
+    else:
+        cal_Left = left
+    if(right == None):
+        cal_Right = 10000
+    else:
+        cal_Right = right
+
+    # pega a direção com menor distancia
+    if(cal_Up < cal_Down and cal_Up < cal_Left and cal_Up < cal_Right):
+        return "up"
+    elif(cal_Down < cal_Up and cal_Down < cal_Left and cal_Down < cal_Right):
+        return "down"
+    elif(cal_Left < cal_Up and cal_Left < cal_Down and cal_Left < cal_Right):
+        return "left"
+    elif(cal_Right < cal_Up and cal_Right < cal_Down and cal_Right < cal_Left):
+        return "right"
+    
+    # passo = random.choice(directions)
+    # return passo
  
         
 app = GridWorld(N, M, L, grid, example_callback)
@@ -269,8 +309,8 @@ print("Score:",score)
 print("Number of decisions:", app.number_decisions)  
 
 def add_to_file(decisions):
-    current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    file_path = os.path.join(os.path.dirname(__file__), "decisions.txt")
+    
+    file_path = os.path.join(os.path.dirname(__file__), "decisions_log.txt")
     with open(file_path, "a") as file:
-        file.write(f"Tentativa {current_time}: numero de decisoes: {decisions}\n")
+        file.write(f"{decisions}\n")
 add_to_file(app.number_decisions)
